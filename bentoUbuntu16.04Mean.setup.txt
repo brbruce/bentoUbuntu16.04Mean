@@ -1,0 +1,162 @@
+Creating MEAN dev box using Ubuntu 16.04 (Xenial)
+===========================
+4/25/2017
+
+Installed:
+Vagrant 1.9.3
+VirtualBox 5.1.18
+
+---------------------------
+
+# NOTE: Vagrant recommends running bento boxes instead of ubuntu official.  The Bento boxes are minimized, and support multiple providers.
+# ubuntu releases support only virtualbox and are full releases.
+
+vagrant init bento/ubuntu-16.04; 
+
+vagrant up
+
+vagrant ssh
+
+# Check Ubuntu version
+lsb_release -a
+  No LSB modules are available.
+  Distributor ID: Ubuntu
+  Description:    Ubuntu 16.04.2 LTS
+  Release:        16.04
+  Codename:       xenial
+
+# Update packages
+sudo apt-get update        # Fetches the list of available updates
+sudo apt-get upgrade       # Strictly upgrades the current packages
+sudo apt-get dist-upgrade  # Installs updates (new ones)
+sudo apt-get autoremove    # Remove unused dependencies
+sudo apt-get clean         # Clean downloaded package files from /var/cache/apt/archives
+
+# Reboot.  Exit SSH
+vagrant halt
+vagrant up
+
+# git
+sudo apt-get install git
+  
+  git is already the newest version (1:2.7.4-0ubuntu1).
+  git --version
+  git version 2.7.4
+
+# Node
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+  
+  node -v
+  v6.10.2
+
+  npm -v
+  3.10.10
+
+# Mongodb - Current stable = 3.4.4
+# See https://docs.mongodb.com/master/tutorial/install-mongodb-on-ubuntu/
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+sudo service mongod start
+
+mongo
+  MongoDB shell version v3.4.4
+  connecting to: mongodb://127.0.0.1:27017
+  MongoDB server version: 3.4.4
+
+# Configure mongod to start automatically on startup
+sudo systemctl enable mongod
+
+# bower
+# grunt
+# yeoman
+# meanjs.org
+sudo npm install -g bower grunt-cli yo generator-meanjs
+
+  Yeoman Doctor
+  Running sanity checks on your system
+
+  * Global configuration file is valid
+  * NODE_PATH matches the npm root
+  * Node.js version
+  * No .bowerrc file in home directory
+  * No .yo-rc.json file in home directory
+  * npm version
+
+  Everything looks all right!
+
+  yo --version
+  1.8.5
+
+  bower --version
+  1.8.0
+
+  grunt --version
+  grunt-cli v1.2.0
+
+# Ruby and Sass - Required for grunt.
+sudo npm install grunt-contrib-sass --save-dev
+sudo apt-get install ruby-compass
+
+# Install meanjs scaffolding
+# Make sure you are running the Cygwin shell for the vagrant box as Administrator!!!!
+
+cd /vagrant
+yo meanjs
+
+------------------------------
+
+# Packaging:
+
+# First clean up the APT cache and disk and bash history
+
+sudo rm /var/vagrant_provision
+sudo apt-get clean
+sudo dd if=/dev/zero of=/EMPTY bs=1M
+sudo rm -f /EMPTY
+cat /dev/null > ~/.bash_history && history -c && exit
+
+# Copy bootstrap.sh and edited Vagrantfile from git.
+# Vagrantfile is set up for host-only networking.
+# The bootstrap file has nothing in it.  Just as a sample of how to use it.
+#
+# Included files are stored in the packaged box directory under ./include.
+# Ex. C:\Users\publi\.vagrant.d\boxes\bentoUbuntu16.04Mean3\0\virtualbox\include
+# The edited Vagrantfile is used as the base config for the box but is not visible.  
+# A new blank template file is aways included after vagrant init is run.
+#
+# To access the bootstrap.sh file from the Vagrantfile, use File.expand_path with __FILE__ variable. 
+# Ex. config.vm.provision :shell, path: File.expand_path("../bootstrap.sh", __FILE__)
+
+vagrant package --vagrantfile ./Vagrantfile  --include bootstrap.sh 
+
+vagrant box add --force --name bentoUbuntu16.04Mean package.box
+
+-------------------------------
+
+# Test the new box:
+
+cd ..; mkdir test; cd test
+vagrant init bentoUbuntu16.04Mean
+vagrant up
+vagrant ssh
+
+# Confirm mongod is running
+mongo
+
+# start sample mean app
+cd /vagrant/meanapp
+grunt
+
+# Connect to port 81 from host server.  Should connect to port 3000 on vagrant.
+
+
+
+
+
+
+

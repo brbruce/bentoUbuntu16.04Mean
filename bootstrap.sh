@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+#===========================
+# Just an example shell script to illustrate how to package it with the
+# vagrant box.
+#
+# Included files are stored in the packaged box directory under ./include.
+# Ex. C:\Users\publi\.vagrant.d\boxes\bentoUbuntu16.04Mean3\0\virtualbox\include
+# The edited Vagrantfile is used as the base config for the box but is not visible.  
+# A new blank template file is aways included after vagrant init is run.
+#
+# To access the bootstrap.sh file from the Vagrantfile, use File.expand_path with __FILE__ variable. 
+# Ex. config.vm.provision :shell, path: File.expand_path("../bootstrap.sh", __FILE__)
+#
+# To package files with vagrant use this command:
+# vagrant package --vagrantfile ./Vagrantfile  --include bootstrap.sh 
+#===========================
+
+# apt-get update
+# apt-get install -y apache2
+# if ! [ -L /var/www ]; then
+#   rm -rf /var/www
+#   ln -fs /vagrant /var/www
+# fi
+
+# BBRUCE - Only run the follownig commands on the very first vagrant up by checking a file
+#if [ -f "/var/vagrant_provision" ]; then
+#  exit 0
+#fi
+
+# Start mongodb - This does not work after a halt.  Use systemctl enable mongod instead.
+#service mongod restart
+
+touch /var/vagrant_provision
