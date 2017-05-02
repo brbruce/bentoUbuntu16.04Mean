@@ -16,6 +16,7 @@
 # vagrant package --vagrantfile ./Vagrantfile  --include bootstrap.sh 
 #===========================
 
+# Sample - Install and configure Apache
 # apt-get update
 # apt-get install -y apache2
 # if ! [ -L /var/www ]; then
@@ -23,7 +24,8 @@
 #   ln -fs /vagrant /var/www
 # fi
 
-# BBRUCE - Only run the follownig commands on the very first vagrant up by checking a file
+# BBRUCE - Sample
+# Only run the following commands on the very first vagrant up by checking a file
 #if [ -f "/var/vagrant_provision" ]; then
 #  exit 0
 #fi
