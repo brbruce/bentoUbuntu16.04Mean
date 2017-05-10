@@ -33,4 +33,4 @@
 # Start mongodb - This does not work after a halt.  Use systemctl enable mongod instead.
 #service mongod restart
 
-touch /var/vagrant_provision
+#touch /var/vagrant_provision

@@ -96,17 +96,34 @@ Vagrant.configure("2") do |config|
   # SHELL
 
   #-------------
-  # BBRUCE - Reference the sh file which was --included
+  # BBRUCE - Sample of included shell script file
   #-------------
-  config.vm.provision :shell, path: File.expand_path("../bootstrap.sh", __FILE__)
+  #config.vm.provision :shell, path: File.expand_path("../bootstrap.sh", __FILE__)
 
   #-------------
   # BBRUCE - Sample of inline script with default user instead of root.
   #-------------
-  # $script = <<-SCRIPT
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SCRIPT
-  # config.vm.provision "shell", inline: $script, privileged: false
+  $script = <<-SCRIPT
+    # Stuff
+  SCRIPT
+  config.vm.provision "shell", inline: $script, privileged: false
+
+  #-------------
+  # BBRUCE - Sample of script which is only run once on first startup.  Runs as root.
+  # Set timezone to EST.
+  #-------------
+  $script = <<-SCRIPT
+    # Only run the following commands on the very first vagrant up by checking a file
+    if [ -f "/var/vagrant_provision" ]; then
+      exit 0
+    fi
+
+    # Set timezone to EST
+    echo \"America/New_York\" | tee /etc/timezone && rm /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
+
+    # Set file flag on first execution only
+    touch /var/vagrant_provision
+  SCRIPT
+  config.vm.provision "shell", inline: $script
 
 end
