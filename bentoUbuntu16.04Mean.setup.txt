@@ -155,7 +155,69 @@ grunt
 # Connect to port 81 from host server.  Should connect to port 3000 on vagrant.
 
 
+--------------------------------
 
+# How to update the existing box with a modified local forwarded port, and create a new package.
+# Existing vagrant box: C:\Users\publi\.vagrant.d\boxes\bentoUbuntu16.04Mean
+# Create edited box named bentoUbuntu16.04Mean80
+
+
+# 1. Create a new directory and install the existing box.  (Already created in C:\Users\publi\.vagrant.d\boxes\bentoUbuntu16.04Mean)
+
+cd ..; mkdir test; cd test
+vagrant init bentoUbuntu16.04Mean
+vagrant up
+vagrant ssh
+
+# In vagrant image:
+
+# Confirm mongod is running
+mongo
+
+# Set public ssh key to default vagrant public key: (See Vagrant SSH problem.txt)
+cd ~
+wget https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub -O .ssh/authorized_keys
+chmod 700 .ssh
+chmod 600 .ssh/authorized_keys
+chown -R vagrant:vagrant .ssh
+
+# Clean up the APT cache and disk and bash history
+
+sudo rm /var/vagrant_provision
+sudo apt-get clean
+sudo dd if=/dev/zero of=/EMPTY bs=1M
+sudo rm -f /EMPTY
+cat /dev/null > ~/.bash_history && history -c && exit
+
+# In DOS cmd:
+
+vagrant halt
+
+# 2. Reconfigure and package and add new box.
+
+# Edit bootstrap.sh and Vagrantfile as needed.  
+# Changing local port from 81 to 80.
+# Set VagrantFile config.vm.box to same name as the final vagrant image = "bentoUbuntu16.04Mean80"
+# Add line to prevent the SSH keys from being replaced.
+  config.ssh.insert_key = false
+
+# Now package the box:
+
+vagrant package --vagrantfile ./Vagrantfile  --include bootstrap.sh --output bentoUbuntu16.04Mean80
+
+# Vagrant box exported.  bentoUbuntu16.04Mean80 file and .vagrant directory created in local dir.
+# Box is not yet added to C:\Users\publi\.vagrant.d\boxes
+
+vagrant box add --force --name bentoUbuntu16.04Mean80 bentoUbuntu16.04Mean80
+
+# Now box is added to C:\Users\publi\.vagrant.d\boxes
+
+# 3. Create new directory and install the new box.
+
+cd ..; mkdir test2; cd test2
+vagrant init bentoUbuntu16.04Mean80
+vagrant up
+vagrant ssh
 
 
 

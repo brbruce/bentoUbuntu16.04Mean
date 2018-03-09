@@ -27,25 +27,48 @@ Vagrant.configure("2") do |config|
   # https://docs.vagrantup.com.
 
   # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "bentoUbuntu16.04Mean"
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "bentoUbuntu16.04Mean80"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
   # config.vm.box_check_update = false
 
+  #-------------------------------------------------
+  # Fix for SSH problem with repackaged boxes.  Uses generated public key in
+  # vagrant instance but default Vagrant private key on host during UP.
+  #
+  # Make sure vagrant instance to be packaged has default Vagrant public key.
+  # Prevent vagrant from replacing the default ssh keys.
+  #-------------------------------------------------
+  config.ssh.insert_key = false
+
+  # If you do want to use your own public and private key, set your private key
+  # location here.  It should match the public key in the instance.
+  #config.ssh.private_key_path = 'C:/Users/publi/.vagrant.d/boxes/bentoUbuntu16.04Mean/0/virtualbox/vagrant_private_key'
+
+  # Or you can use user/pass instead of ssh.  But you will need to enter the password
+  # manually each time.
+  #config.ssh.username = 'vagrant'
+  #config.ssh.password = 'vagrant'
+
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
   # config.vm.network "forwarded_port", guest: 80, host: 8080
 
   #-------------
-  # BBRUCE - Open a default port 81 to 3000 for the mean server.
+  # BBRUCE - Open a default port 80 to 3000 for the mean server.
   # BBRUCE - forward_port is vagrant config 1.  forwarded_port is vagrant 2.
   # host_ip required - bug.  Will get error.
   #-------------
-  config.vm.network :forwarded_port, guest: 3000, host: 81, host_ip: "127.0.0.1"
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network :forwarded_port, guest: 3000, host: 80, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -103,10 +126,10 @@ Vagrant.configure("2") do |config|
   #-------------
   # BBRUCE - Sample of inline script with default user instead of root.
   #-------------
-  $script = <<-SCRIPT
-    # Stuff
-  SCRIPT
-  config.vm.provision "shell", inline: $script, privileged: false
+  #$script = <<-SCRIPT
+  #  #Stuff
+  #SCRIPT
+  #config.vm.provision "shell", inline: $script, privileged: false
 
   #-------------
   # BBRUCE - Sample of script which is only run once on first startup.  Runs as root.
